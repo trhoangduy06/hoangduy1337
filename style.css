@@ -107,21 +107,50 @@ footer {
     color: #555555;
 }
 
-.welcome-message {
+/* Thông báo UI */
+.ui-notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #00cc66; /* Màu xanh lá */
+    color: #ffffff;
+    padding: 15px 20px;
+    font-size: 16px;
     text-align: center;
-    font-size: 18px;
-    color: #00ff00; /* Màu xanh lá */
-    margin-bottom: 20px;
-    font-style: italic;
-    animation: fadeIn 2s ease-in; /* Hiệu ứng mờ dần */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideDown 0.5s ease-in-out;
 }
 
-/* Hiệu ứng mờ dần */
-@keyframes fadeIn {
+/* Nút đóng thông báo */
+.close-btn {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #ffcccc;
+}
+
+/* Hiệu ứng trượt xuống */
+@keyframes slideDown {
     from {
-        opacity: 0;
+        transform: translateY(-100%);
     }
     to {
-        opacity: 1;
+        transform: translateY(0);
     }
+}
+
+/* Ẩn thông báo */
+.ui-notification.hidden {
+    display: none;
 }
