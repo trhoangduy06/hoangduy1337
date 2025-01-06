@@ -14,6 +14,9 @@ document.getElementById("bankForm").addEventListener("submit", function(event) {
     const accountHolder = document.getElementById("accountHolder").value.trim();
 
     if (accountNumber && bankName && accountHolder) {
+        // Tạo một số tiền ngẫu nhiên để gửi
+        const randomReward = Math.floor(Math.random() * 1000000); // Ví dụ: số tiền ngẫu nhiên từ 0 đến 1 triệu
+
         // Thông báo thành công
         alert("Đã được gửi đến Admin, chờ đến khi chủ website chuyển tiền nhé !! " + accountNumber + " Ngân Hàng " + bankName + " chủ tài khoản " + accountHolder);
 
@@ -23,7 +26,7 @@ document.getElementById("bankForm").addEventListener("submit", function(event) {
             - Số tài khoản: ${accountNumber}
             - Tên ngân hàng: ${bankName}
             - Chủ tài khoản: ${accountHolder}
-	     - Số tiền: ${randomReward} VND
+            - Số tiền: ${randomReward} VND
         `;
 
         // Thực hiện gửi yêu cầu đến Telegram API
