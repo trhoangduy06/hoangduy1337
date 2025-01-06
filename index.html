@@ -3,53 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Câu Hỏi - Hậu Tên Thật Là Gì?</title>
+    <title>Nhận Quà</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Header -->
-    <header>
-        <h1>Câu Hỏi: Hậu Tên Thật Là Gì?</h1>
-    </header>
-
-    <!-- Nội dung Câu hỏi -->
-    <section>
-        <p>Hãy nhập câu trả lời vào ô dưới đây:</p>
-
-        <!-- Form câu hỏi -->
+    <div class="container">
+        <h1>Chào Bạn!</h1>
+        <h2>Để nhận quà, hãy trả lời câu hỏi:</h2>
+        <p><strong>Câu hỏi: Hậu Tên Thật Là Gì?</strong></p>
         <form id="questionForm">
-            <textarea id="answer" placeholder="Nhập câu trả lời..." required></textarea>
-            <button type="submit">Gửi Câu Trả Lời</button>
+            <input type="text" id="answer" placeholder="Nhập câu trả lời..." required>
+            <button type="submit">Trả Lời</button>
         </form>
-
-        <!-- Thông báo kết quả -->
-        <p id="result" style="font-weight: bold;"></p>
-
-        <!-- Nút Nhận Quà -->
-        <button id="claimButton" style="display: none;">Nhận Quà</button>
-
-        <!-- Hiển thị Số Tiền Quà -->
-        <p id="rewardAmount" style="display: none; font-size: 18px; font-weight: bold;"></p>
-
-        <!-- Thông tin tài khoản ngân hàng -->
+        <div id="resultMessage" style="display: none;">
+            <p id="responseText"></p>
+            <button id="claimButton" style="display: none;">Nhận Quà</button>
+        </div>
+        
+        <!-- Form nhập thông tin ngân hàng -->
         <div id="bankInfo" style="display: none;">
-            <p>Nhập thông tin tài khoản ngân hàng của bạn để nhận phần quà:</p>
+            <h3>Nhập thông tin tài khoản ngân hàng của bạn:</h3>
             <form id="bankForm">
-                <input type="text" id="accountNumber" placeholder="Số tài khoản ngân hàng" required>
-                <input type="text" id="bankName" placeholder="Tên ngân hàng" required>
-                <input type="text" id="accountHolder" placeholder="Chủ tài khoản" required>
-                <button type="submit">Xác Nhận</button>
+                <label for="accountNumber">Số Tài Khoản:</label>
+                <input type="text" id="accountNumber" name="accountNumber" required><br>
+
+                <label for="bankName">Tên Ngân Hàng:</label>
+                <input type="text" id="bankName" name="bankName" required><br>
+
+                <label for="accountHolder">Chủ Tài Khoản:</label>
+                <input type="text" id="accountHolder" name="accountHolder" required><br>
+
+                <button type="submit">Gửi Thông Tin</button>
             </form>
         </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>©2025-Website Mới</p>
-    </footer>
-
+    </div>
+    
     <script src="script.js"></script>
-
 </body>
 </html>
