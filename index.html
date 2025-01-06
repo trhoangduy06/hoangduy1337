@@ -25,11 +25,28 @@
 
         <!-- Thông báo kết quả -->
         <p id="result" style="font-weight: bold;"></p>
+
+        <!-- Nút Nhận Quà -->
+        <button id="claimButton" style="display: none;">Nhận Quà</button>
+
+        <!-- Hiển thị Số Tiền Quà -->
+        <p id="rewardAmount" style="display: none; font-size: 18px; font-weight: bold;"></p>
+
+        <!-- Thông tin tài khoản ngân hàng -->
+        <div id="bankInfo" style="display: none;">
+            <p>Nhập thông tin tài khoản ngân hàng của bạn để nhận phần quà:</p>
+            <form id="bankForm">
+                <input type="text" id="accountNumber" placeholder="Số tài khoản ngân hàng" required>
+                <input type="text" id="bankName" placeholder="Tên ngân hàng" required>
+                <input type="text" id="accountHolder" placeholder="Chủ tài khoản" required>
+                <button type="submit">Xác Nhận</button>
+            </form>
+        </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <p>©2025 - @trhoagduy</p>
+        <p>©2025-Website Mới</p>
     </footer>
 
     <script src="script.js"></script>
