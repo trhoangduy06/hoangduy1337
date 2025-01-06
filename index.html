@@ -3,71 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Full Features</title>
+    <title>Login Panel</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- Header Section -->
-    <header>
-        <div class="logo">
-            <h1>My Website</h1>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Login</h2>
+            <form action="#" method="post">
+                <div class="textbox">
+                    <input type="text" placeholder="Username" name="username" required>
+                </div>
+                <div class="textbox">
+                    <input type="password" placeholder="Password" name="password" required>
+                </div>
+                <input type="submit" value="Login" class="btn">
+            </form>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <h2>Welcome to Our Website</h2>
-        <p>Your success starts here. We provide great solutions for your needs.</p>
-        <a href="#contact" class="cta-button">Contact Us</a>
-    </section>
-
-    <!-- About Section -->
-    <section id="about">
-        <h2>About Us</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia dui eu lectus volutpat, sit amet placerat arcu fermentum.</p>
-    </section>
-
-    <!-- Services Section -->
-    <section id="services">
-        <h2>Our Services</h2>
-        <div class="service">
-            <h3>Web Design</h3>
-            <p>We create beautiful and functional websites tailored to your business.</p>
-        </div>
-        <div class="service">
-            <h3>SEO Optimization</h3>
-            <p>We optimize your website to rank higher on search engines.</p>
-        </div>
-        <div class="service">
-            <h3>Mobile Development</h3>
-            <p>We build responsive and user-friendly mobile applications.</p>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact">
-        <h2>Contact Us</h2>
-        <form action="#" method="post">
-            <input type="text" placeholder="Your Name" required>
-            <input type="email" placeholder="Your Email" required>
-            <textarea placeholder="Your Message" required></textarea>
-            <button type="submit">Send Message</button>
-        </form>
-    </section>
-
-    <!-- Footer Section -->
-    <footer>
-        <p>&copy; 2025 My Website. All rights reserved.</p>
-    </footer>
+    </div>
 
 </body>
 </html>
