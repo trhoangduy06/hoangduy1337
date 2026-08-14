@@ -2,10 +2,230 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=dstat.php">
-    <title>Đang chuyển hướng...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSTAT - System Monitor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e94560;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #a8a8a8;
+            margin-top: 5px;
+        }
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #ff6b6b;
+        }
+    </style>
 </head>
 <body>
-    <p>Đang chuyển hướng đến <a href="dstat.php">dstat.php</a>...</p>
+    <div class="container">
+        <h1>📊 DSTAT - System Monitor</h1>
+        
+        <div class="card">
+            <h3>Browser Information</h3>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="browser"></div>
+                    <div class="stat-label">Browser</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="os"></div>
+                    <div class="stat-label">Operating System</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="screen"></div>
+                    <div class="stat-label">Screen Resolution</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="language"></div>
+                    <div class="stat-label">Language</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Performance</h3>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="memory"></div>
+                    <div class="stat-label">Memory Usage</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="cores"></div>
+                    <div class="stat-label">CPU Cores</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="online"></div>
+                    <div class="stat-label">Online Status</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="connection"></div>
+                    <div class="stat-label">Connection</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Network Information</h3>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="ip"></div>
+                    <div class="stat-label">Your IP (via API)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="download"></div>
+                    <div class="stat-label">Download Speed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="ping"></div>
+                    <div class="stat-label">Ping</div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="refreshData()">🔄 Refresh Data</button>
+    </div>
+
+    <script>
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            let browser = "Unknown";
+            
+            if (ua.includes("Firefox")) browser = "Firefox";
+            else if (ua.includes("Chrome")) browser = "Chrome";
+            else if (ua.includes("Safari")) browser = "Safari";
+            else if (ua.includes("Edge")) browser = "Edge";
+            else if (ua.includes("Opera")) browser = "Opera";
+            
+            return browser;
+        }
+
+        function getOS() {
+            const ua = navigator.userAgent;
+            let os = "Unknown";
+            
+            if (ua.includes("Windows")) os = "Windows";
+            else if (ua.includes("Mac")) os = "macOS";
+            else if (ua.includes("Linux")) os = "Linux";
+            else if (ua.includes("Android")) os = "Android";
+            else if (ua.includes("iOS")) os = "iOS";
+            
+            return os;
+        }
+
+        function testDownloadSpeed() {
+            const startTime = performance.now();
+            const imageUrl = 'https://via.placeholder.com/1000x1000.png?text=Speed+Test+' + Date.now();
+            
+            return fetch(imageUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const endTime = performance.now();
+                    const duration = (endTime - startTime) / 1000;
+                    const sizeInBits = blob.size * 8;
+                    const speedMbps = (sizeInBits / duration / 1000000).toFixed(2);
+                    return speedMbps + ' Mbps';
+                })
+                .catch(() => 'N/A');
+        }
+
+        function testPing() {
+            const startTime = performance.now();
+            return fetch(window.location.href)
+                .then(() => {
+                    const endTime = performance.now();
+                    return Math.round(endTime - startTime) + ' ms';
+                })
+                .catch(() => 'N/A');
+        }
+
+        function getIPAddress() {
+            return fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => data.ip)
+                .catch(() => 'N/A');
+        }
+
+        function refreshData() {
+            // Browser info
+            document.getElementById('browser').textContent = getBrowserInfo();
+            document.getElementById('os').textContent = getOS();
+            document.getElementById('screen').textContent = 
+                window.screen.width + 'x' + window.screen.height;
+            document.getElementById('language').textContent = navigator.language;
+            
+            // Performance
+            const memory = performance.memory ? 
+                (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB' : 
+                'N/A';
+            document.getElementById('memory').textContent = memory;
+            document.getElementById('cores').textContent = 
+                navigator.hardwareConcurrency || 'N/A';
+            document.getElementById('online').textContent = 
+                navigator.onLine ? 'Online' : 'Offline';
+            
+            const connection = navigator.connection;
+            document.getElementById('connection').textContent = 
+                connection ? connection.effectiveType : 'N/A';
+            
+            // Network
+            getIPAddress().then(ip => {
+                document.getElementById('ip').textContent = ip;
+            });
+            
+            testDownloadSpeed().then(speed => {
+                document.getElementById('download').textContent = speed;
+            });
+            
+            testPing().then(ping => {
+                document.getElementById('ping').textContent = ping;
+            });
+        }
+
+        // Initial load
+        refreshData();
+    </script>
 </body>
 </html>
