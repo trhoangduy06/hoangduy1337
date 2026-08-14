@@ -1,363 +1,227 @@
+<?php
+session_start();
 
+// Khởi tạo session tracking nếu chưa có
+if (!isset($_SESSION['request_log'])) {
+    $_SESSION['request_log'] = [];
+    $_SESSION['total_connections'] = 0;
+    $_SESSION['unique_ips'] = [];
+}
+
+// Lấy thông tin client
+$client_ip = $_SERVER['REMOTE_ADDR'];
+$user_agent = $_SERVER['HTTP_USER_AGENT'];
+$request_method = $_SERVER['REQUEST_METHOD'];
+$request_uri = $_SERVER['REQUEST_URI'];
+$request_time = date('Y-m-d H:i:s');
+
+// Thêm request vào log
+$request_log = $_SESSION['request_log'];
+$new_request = [
+    'time' => $request_time,
+    'method' => $request_method,
+    'url' => $request_uri,
+    'ip' => $client_ip,
+    'user_agent' => $user_agent,
+    'status' => 'Success'
+];
+
+array_unshift($request_log, $new_request);
+if (count($request_log) > 50) {
+    array_pop($request_log);
+}
+$_SESSION['request_log'] = $request_log;
+
+// Cập nhật tổng connections
+$_SESSION['total_connections']++;
+
+// Thêm IP vào danh sách unique
+if (!in_array($client_ip, $_SESSION['unique_ips'])) {
+    $_SESSION['unique_ips'][] = $client_ip;
+}
+
+// Trả về JSON nếu là AJAX request
+if (isset($_GET['api'])) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'total_connections' => $_SESSION['total_connections'],
+        'unique_visitors' => count($_SESSION['unique_ips']),
+        'requests' => $_SESSION['request_log'],
+        'client_ip' => $client_ip,
+        'server_time' => date('Y-m-d H:i:s')
+    ]);
+    exit;
+}
+?>
 
 <!DOCTYPE html>
-<html lang="en" style="background-color:rgb(0,0,0);">
+<html lang="vi">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Godz-Soldiers.xyz | Layer7 Dstat</title>
-
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-
-    <script src="highcharts.js"></script>
-    <script src="exporting.js"></script>
-
-    <script language="JavaScript">
-        $(function() {
-            var mychart;
-            var previous = null;
-            var count = 0;
-            var extra = [
-                'L7 GRAPH (BY Godz Soldiers) - HIT >> http://52.10.13.244/ <<',
-                'Requests Per Second of 52.10.13.244',
-                '# Requests', 
-            ];
-
-            $(window).load(function(){
-                initiateChart("container");
-                parseFile();
-            });
-
-            function parseFile()
-            {
-                $.ajax({
-                    url: "http://52.10.13.244/nginx_status",
-                    dataType: "text",
-                    cache: false
-                })
-                .done(function(data) {
-                    var current = 0;
-                    var part = data.split(' ')[9];
-                    var series = mychart.series[0],
-                    current = parseInt(part);
-                    shift = series.data.length > 40; 
-                    if (previous !== null) {                        
-                        series.addPoint(
-                            [Math.floor($.now()), 
-                                current-previous
-                            ],
-                            true, 
-                            shift
-                        );
-                    }
-                    previous = current;
-                    count++;
-                    // call it again after one second
-                    setTimeout(parseFile, 1000); 
-
-                })
-                .fail(function( jqXHR, textStatus, errorThrown) {
-                    console.log(errorThrown);
-                });
-            }
-
-            function initiateChart(divid)
-            {
-                Highcharts.createElement('link', {
-                   href: '//fonts.googleapis.com/css?family=Unica+One',
-                   rel: 'stylesheet',
-                   type: 'text/css'
-                }, null, document.getElementsByTagName('head')[0]);
-                
-                var options = {
-                    colors: ["#2b908f", "#90ee7e", "#f45b5b", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee", "#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
-                    chart: {
-                        zoomType: 'x',
-                        renderTo: divid,
-                        backgroundColor: {
-                            linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
-                            stops: [
-                                [0, '#2a2a2b'],
-                                [1, '#3e3e40']
-                            ]
-                        },
-                        style: {
-                            fontFamily: "'Unica One', sans-serif"
-                        },
-                        plotBorderColor: '#606063'
-                    },
-                    title: {
-                        text: extra[0],
-                        style: {
-                            color: '#E0E0E3',
-                            textTransform: 'uppercase',
-                            fontSize: '20px'
-                        }
-                    },
-                    subtitle: {
-                        text: extra[1],
-                        style: {
-                            color: '#E0E0E3',
-                            textTransform: 'uppercase'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                        style: {
-                            color: '#F0F0F0'
-                        },
-                        crosshairs: [
-                            {
-                                width: 1,
-                                color: '#A5A5A5'
-                            },
-                            {
-                                width: 1,
-                                color: '#A5A5A5'
-                            }
-                        ]
-                    },
-                    plotOptions: {
-                        series: {
-                            dataLabels: {
-                                color: '#B0B0B3'
-                            },
-                            marker: {
-                                lineColor: '#333'
-                            }
-                        },
-                        boxplot: {
-                            fillColor: '#505053'
-                        },
-                        candlestick: {
-                            lineColor: 'white'
-                        },
-                        errorbar: {
-                            color: 'white'
-                        },
-                        area: {
-                            fillColor: {
-                                linearGradient: {
-                                    x1: 0,
-                                    y1: 0,
-                                    x2: 0,
-                                    y2: 1
-                                },
-                                stops: [
-                                    [0, '#2b908f'],
-                                    [1, Highcharts.Color('#2b908f').setOpacity(0).get('rgba')]
-                                ]
-                            },
-                            marker: {
-                                radius: 2
-                            },
-                            lineWidth: 1,
-                            states: {
-                                hover: {
-                                    lineWidth: 1
-                                }
-                            },
-                            threshold: null
-                        }
-                    },
-                    legend: {
-                        enabled: false
-                    },
-                    credits: {
-                        style: {
-                            color: '#666'
-                        }
-                    },
-                    labels: {
-                        style: {
-                            color: '#707073'
-                        }
-                    },
-                    drilldown: {
-                        activeAxisLabelStyle: {
-                            color: '#F0F0F3'
-                        },
-                        activeDataLabelStyle: {
-                            color: '#F0F0F3'
-                        }
-                    },
-                    navigation: {
-                        buttonOptions: {
-                            symbolStroke: '#DDDDDD',
-                            theme: {
-                                fill: '#505053'
-                            }
-                        }
-                    },
-                    rangeSelector: {
-                        buttonTheme: {
-                            fill: '#505053',
-                            stroke: '#000000',
-                            style: {
-                                color: '#CCC'
-                            },
-                            states: {
-                                hover: {
-                                    fill: '#707073',
-                                    stroke: '#000000',
-                                    style: {
-                                        color: 'white'
-                                    }
-                                },
-                                select: {
-                                    fill: '#000003',
-                                    stroke: '#000000',
-                                    style: {
-                                        color: 'white'
-                                    }
-                                }
-                            }
-                        },
-                        inputBoxBorderColor: '#505053',
-                        inputStyle: {
-                            backgroundColor: '#333',
-                            color: 'silver'
-                        },
-                        labelStyle: {
-                            color: 'silver'
-                        }
-                    },
-                    navigator: {
-                        handles: {
-                            backgroundColor: '#666',
-                            borderColor: '#AAA'
-                        },
-                        outlineColor: '#CCC',
-                        maskFill: 'rgba(255,255,255,0.1)',
-                        series: {
-                            color: '#7798BF',
-                            lineColor: '#A6C7ED'
-                        },
-                        xAxis: {
-                            gridLineColor: '#505053'
-                        }
-                    },
-                    scrollbar: {
-                        barBackgroundColor: '#808083',
-                        barBorderColor: '#808083',
-                        buttonArrowColor: '#CCC',
-                        buttonBackgroundColor: '#606063',
-                        buttonBorderColor: '#606063',
-                        rifleColor: '#FFF',
-                        trackBackgroundColor: '#404043',
-                        trackBorderColor: '#404043'
-                    },
-
-                    legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    background2: '#505053',
-                    dataLabelsColor: '#B0B0B3',
-                    textColor: '#C0C0C0',
-                    contrastTextColor: '#F0F0F3',
-                    maskColor: 'rgba(255,255,255,0.3)',
-                    yAxis: {
-                        gridLineColor: '#707073',
-                        labels: {
-                            style: {
-                                color: '#E0E0E3'
-                            }
-                        },
-                        lineColor: '#707073',
-                        minorGridLineColor: '#505053',
-                        tickColor: '#707073',
-                        tickWidth: 1,
-                        title: {
-                            text: extra[2],
-                            style: {
-                                color: '#A0A0A3'
-                            }
-                        }
-                    },
-
-                    xAxis: {
-                        type: 'datetime',
-                        dateTimeLabelFormats: {
-                            day: '%a'
-                        },
-                        gridLineColor: '#707073',
-                        labels: {
-                            style: {
-                                color: '#E0E0E3'
-                            }
-                        },
-                        lineColor: '#707073',
-                        minorGridLineColor: '#505053',
-                        tickColor: '#707073',
-                        title: {
-                            style: {
-                                color: '#A0A0A3'
-                            }
-                        }
-                    },
-
-                    series: [{
-                        type: 'area',
-                        name: 'Total Requests',
-                        data: []
-                    }]
-                };
-
-                mychart = new Highcharts.Chart(options);
-                
-                
-            }
-
-        });
-    </script>
-<style type="text/css" media="screen">
-a:link { color:#ffffff; text-decoration: none; }
-a:visited { color:#ffffff; text-decoration: none; }
-a:hover { color:#ffffff; text-decoration: none; }
-a:active { color:#ffffff; text-decoration: underline; }
-</style>
-
-    </head>
-    <body>
-<center>
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-54839441-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-        <div id="container" style="width: 1000px; height: 500px; margin: 0 auto; margin-top: 15px;"></div>
-
-		
-<center>
-<a href="http://exotic-power.pw/"><img width="500px" height="80px" src="https://s29.postimg.org/w19dplzl3/7692_350_KB_Version_gif.gif"></a>
-</center>
-
-<br>
-<font color="white">This graph its supported by:<br>
-Google Chrome with Cors Toggle installed plugin, download it here: <a target="_blank" href="https://chrome.google.com/webstore/detail/cors-toggle/omcncfnpmcabckcddookmnajignpffnh/related?hl=it">DOWNLOAD</a></font>
-<br>
-<font color="white">
-Firefox with Cors Everywhere installed plugin, download it here: <a target="_blank" href="https://addons.mozilla.org/cs/firefox/addon/cors-everywhere/?src=userprofile">DOWNLOAD</a>
-<br>
-<font color="white">
-Internet Explorer with enabled Allow-Control-Allow-Origin function: <a target="_blank" href="http://oi64.tinypic.com/293gbo4.jpg">CLICK HERE</a>
-<br>
-<br>
-<MARQUEE WIDTH="20px" direction="right"><font color="red">>></font></MARQUEE>
-<font color="white">hit http://52.10.13.244/</font>
-<MARQUEE WIDTH="20px" direction="left"><font color="red"><<</font></MARQUEE>
-<br>
-<br>
-<font color="red">NOTICE:<font color="white"> These graphs are free, please, do not perform long attacks and do not complain about them.</font></font>
-</center>
-		
-    </body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSTAT - PHP Connection Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a1a;
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #2a3a6e;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #a8a8a8;
+        }
+        
+        .table-container {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #0f3460;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #2a3a6e;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .badge-get { background: #4caf50; color: white; }
+        .badge-post { background: #2196f3; color: white; }
+        .badge-put { background: #ff9800; color: white; }
+        .badge-delete { background: #f44336; color: white; }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 20px;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 DSTAT - PHP Connection Monitor</h1>
+        <p>Real-time Connection Tracking</p>
+    </div>
+    
+    <div class="container">
+        <div style="text-align: center;">
+            <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value"><?php echo $_SESSION['total_connections']; ?></div>
+                <div class="stat-label">Total Connections</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value"><?php echo count($_SESSION['unique_ips']); ?></div>
+                <div class="stat-label">Unique Visitors</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value"><?php echo $client_ip; ?></div>
+                <div class="stat-label">Your IP</div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <h3>📋 Request Log</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Method</th>
+                        <th>URL</th>
+                        <th>IP Address</th>
+                        <th>User Agent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($_SESSION['request_log'] as $request): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($request['time']); ?></td>
+                        <td>
+                            <span class="badge badge-<?php echo strtolower($request['method']); ?>">
+                                <?php echo htmlspecialchars($request['method']); ?>
+                            </span>
+                        </td>
+                        <td><?php echo htmlspecialchars($request['url']); ?></td>
+                        <td><?php echo htmlspecialchars($request['ip']); ?></td>
+                        <td><?php echo htmlspecialchars(substr($request['user_agent'], 0, 50)); ?>...</td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
 </html>
-
